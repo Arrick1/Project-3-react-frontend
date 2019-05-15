@@ -12,7 +12,6 @@ class Login extends Component {
           [e.target.name]: e.target.value
         })
       }
-    
       onSubmit = async (e) => {
         e.preventDefault();
         const loginResponse = await fetch('/users/login',{
@@ -25,12 +24,16 @@ class Login extends Component {
         })
 
          const parsedResponse = await loginResponse.json();
-            if(parsedResponse.success){
+            if(parsedResponse.data){
               console.log(parsedResponse)
                 this.props.doSetCurrentUser(parsedResponse.data)
                 this.setState({
                   logged: true
                 })
+            } else {
+              this.setState({
+                message: 'Try again'
+              })
             }
     }
 
@@ -43,7 +46,10 @@ class Login extends Component {
        : <form onSubmit={this.onSubmit}>
             <input type='text' name="username" value={username} onChange={this.changeHandler}/>
             <input type='password' name="password" value={password} onChange={this.changeHandler}/>
-            <button type="submit">Login</button>
+            <button type="submit">Login</button> 
+            {
+              this.state.message
+            }
         </form>
         )
     }

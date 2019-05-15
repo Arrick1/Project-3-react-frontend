@@ -5,7 +5,7 @@ const fetch = require('node-fetch')
 /* GET home page. */
 router.get('/', async (req, res) => {
   try {
-    const exercise = await fetch('https://wger.de/api/v2/exercise/?limit=100&language=2&format=json')
+    const exercise = await fetch('https://wger.de/api/v2/exercise/?limit=100&status=2&language=2&format=json' )
     if(!exercise.ok){
       throw Error(exercise.response.statusText)
     }

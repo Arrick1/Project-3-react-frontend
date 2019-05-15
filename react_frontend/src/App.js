@@ -7,8 +7,11 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 // Components 
 import NavBar from './component/NavBar/Navbar'
 import Login from './component/Login/Login'
+import Register from './component/Register/Register'
+import Logout from './component/Logout/Logout'
 import ShowUser from './component/ShowUser/ShowUser'
 import Exercise from './component/Exercise/Exercise'
+import Profile from "./component/Profile/Profile"
 
 import * as routes from './constants/routes'
 import './App.css';
@@ -47,23 +50,58 @@ class App extends Component {
     }
 
   }
+  deleteItem = i => 
+  this.setState({
+    exercise: this.state.exercise.filter((exercise, index) =>
+    index !== i
+    )
+  })
+
+  addExercise = async (obj) =>{
+    const response = await fetch('/users/add',{
+      method:"POST",
+      credentials: "include",
+      body: JSON.stringify(obj),
+      headers:{
+        "Content-Type": "application/json"
+      }
+    })
+    const parsedResponse = await response.json()
+    if (parsedResponse.success){
+      this.setState({
+      exercise: this.state.exercise.filter((exercise, index) => exercise.id !== obj.id)
+    })
+    }
+
+  }
 
   render() {
     console.log(this.state.exercise)
     const{ exercise } = this.state
     return (
-      <div>
-        <NavBar currentUser={this.state.currentUser}/>
-        <Switch>
-        <Route exact path="/login" render={()=> <Login currentUser={this.state.currentUser} doSetCurrentUser={this.doSetCurrentUser}/>}/>
-        <Route exact path={routes.ROOT} render={() => <div>This is the Root page</div>} />
-        <Route exact path={routes.HOME} render={() => <div>This is the Home Page</div>} />
-        <Route exact path={routes.USERS}  render={() => <div>This is the users page</div>} />
-        <Route exact path={`${routes.USERS}/:id`} render={() => <ShowUser />} />
-        <Route exact path={routes.POSTS}  render={() => <div>This is the posts page</div>} />
-        <Route exact path={routes.EXERCISE} render={() => <div>This is the Exercise page <br/> <Exercise exercise={exercise} /></div> } />
-        <Route render={() => <div>NotFound</div>} />
-        </Switch>
+      <div className="grid-container">
+        <div className='grid-header'><h1>This is the header</h1></div>
+        <div className='grid-nav'><NavBar currentUser={this.state.currentUser}/>
+          <Switch>
+
+          <Route exact path={routes.LOGIN} render={()=> <Login currentUser={this.state.currentUser} doSetCurrentUser={this.doSetCurrentUser}/>}/>
+
+          <Route exact path={routes.REGISTER} render={()=> <Register currentUser={this.state.currentUser} doSetCurrentUser={this.doSetCurrentUser} />}/>
+
+          <Route exact path={routes.LOGOUT} render={()=> <Logout />}/>
+
+          <Route exact path={routes.ROOT} render={() => <div>This is the Root page</div>} />
+          <Route exact path={routes.HOME} render={() => <div>This is the Home Page</div>} />
+          <Route exact path={routes.PROFILE}  render={() => <Profile/>} />
+          <Route exact path={`${routes.USERS}/:id`} render={() => <ShowUser />} />
+          <Route exact path={routes.POSTS}  render={() => <div>This is the posts page  </div>} />
+          <Route exact path={routes.EXERCISE} render={() => <div>This is the Exercise page <br/> <Exercise exercise={exercise} deleteItem={this.deleteItem} addExercise={this.addExercise}/></div> } />
+          <Route render={() => <div>NotFound</div>} />
+          </Switch>
+        </div>
+        <div className='grid-right'>This is the text</div>
+        <div className='grid-left'>This is the image</div>
+        <div className='grid-footer'>this is the footer</div>
       </div>
     );
 

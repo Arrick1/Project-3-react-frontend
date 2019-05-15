@@ -21,10 +21,10 @@ class ShowUser extends Component {
         }
     }
     render (){
+        console.log(this.state)
         return(
             <div>
-                <h1>{this.state.user.username}</h1>
-                <h1>{this.state.user.password}</h1>
+                <h1> HEllo {this.state.user.username}</h1>
              </div>
         )
     }
