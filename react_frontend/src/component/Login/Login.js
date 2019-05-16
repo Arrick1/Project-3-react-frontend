@@ -42,7 +42,7 @@ class Login extends Component {
       console.log(this.props)
      return (
        this.state.logged
-       ? <Redirect to={`/users/${this.props.currentUser._id}`} />
+       ? <Redirect to={`/profile/${this.props.currentUser._id}`} />
        : <form onSubmit={this.onSubmit}>
             <input type='text' name="username" value={username} onChange={this.changeHandler}/>
             <input type='password' name="password" value={password} onChange={this.changeHandler}/>

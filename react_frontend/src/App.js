@@ -1,5 +1,5 @@
 import React,{ Component } from 'react';
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, withRouter } from 'react-router-dom'
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 
@@ -8,7 +8,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import NavBar from './component/NavBar/Navbar'
 import Login from './component/Login/Login'
 import Register from './component/Register/Register'
-import Logout from './component/Logout/Logout'
 import ShowUser from './component/ShowUser/ShowUser'
 import Exercise from './component/Exercise/Exercise'
 import Profile from "./component/Profile/Profile"
@@ -27,12 +26,21 @@ class App extends Component {
     currentUser: user
   })
 
-  componentDidMount(){
+  doLogout = async () =>{
+    await fetch('/users/logout')
+    this.setState({
+      currentUser: null
+    })
+    this.props.history.push(routes.LOGIN)
+  }
+
+  async componentDidMount(){
+    await fetch('/users/logout')
     this.getExercise().then(data =>
       this.setState({
         exercise: data.data.results
       })
-      )
+    ) 
   }
 
   getExercise = async() => {
@@ -81,27 +89,21 @@ class App extends Component {
     return (
       <div className="grid-container">
         <div className='grid-header'><h1>This is the header</h1></div>
-        <div className='grid-nav'><NavBar currentUser={this.state.currentUser}/>
+        <div className='grid-nav'><NavBar doLogout={this.doLogout} currentUser={this.state.currentUser}/>
           <Switch>
-
           <Route exact path={routes.LOGIN} render={()=> <Login currentUser={this.state.currentUser} doSetCurrentUser={this.doSetCurrentUser}/>}/>
-
           <Route exact path={routes.REGISTER} render={()=> <Register currentUser={this.state.currentUser} doSetCurrentUser={this.doSetCurrentUser} />}/>
-
-          <Route exact path={routes.LOGOUT} render={()=> <Logout />}/>
-
-          <Route exact path={routes.ROOT} render={() => <div>This is the Root page</div>} />
-          <Route exact path={routes.HOME} render={() => <div>This is the Home Page</div>} />
-          <Route exact path={routes.PROFILE}  render={() => <Profile/>} />
-          <Route exact path={`${routes.USERS}/:id`} render={() => <ShowUser />} />
+          <Route exact path={routes.ROOT} render={() => <div>This is the Root page</div>} />     
+          <Route exact path= {`${routes.PROFILE}/:id`} render={() => <div><Profile currentUser={this.state.currentUser}/> </div> } />
+          <Route exact path={`${routes.USERS}/:id`} render={() => <ShowUser /> } />
           <Route exact path={routes.POSTS}  render={() => <div>This is the posts page  </div>} />
-          <Route exact path={routes.EXERCISE} render={() => <div>This is the Exercise page <br/> <Exercise exercise={exercise} deleteItem={this.deleteItem} addExercise={this.addExercise}/></div> } />
+          <Route exact path={routes.EXERCISE} render={() => <div className='grid-left'>This is the Exercise page <br/> <Exercise exercise={exercise} deleteItem={this.deleteItem} addExercise={this.addExercise}/></div> } />
           <Route render={() => <div>NotFound</div>} />
           </Switch>
         </div>
-        <div className='grid-right'>This is the text</div>
+        {/* <div className='grid-right'>This is the text</div>
         <div className='grid-left'>This is the image</div>
-        <div className='grid-footer'>this is the footer</div>
+        <div className='grid-footer'>this is the footer</div> */}
       </div>
     );
 
@@ -109,4 +111,4 @@ class App extends Component {
   
 }
 
-export default App;
+export default withRouter(App);

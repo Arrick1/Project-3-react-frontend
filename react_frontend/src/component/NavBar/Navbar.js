@@ -8,21 +8,22 @@ import './NavBar.css'
 
 
 
-const Nav = ({currentUser}) => 
+const Nav = ({currentUser, doLogout}) => 
     <div>
         <h5>NAVBAR</h5>
-        <NavLink to={routes.HOME} exact activeClassName='selected' ><button className="navButton">Home</button></NavLink> 
-        <NavLink to={routes.PROFILE}  exact activeClassName='selected' ><button className="navButton">Profile</button></NavLink> 
-        <NavLink to={routes.POSTS} exact activeClassName='selected' ><button className="navButton">POSTS</button></NavLink> 
-        <NavLink to={routes.EXERCISE} exact activeClassName='selected'><button className="navButton">EXERCISE</button></NavLink>  
-        <NavLink to={routes.ROOT} exact activeClassName='selected'><button className="navButton">ROOT</button></NavLink>  
-        {
-      currentUser
-        ? <NavLink to={routes.LOGIN} activeClassName="selected"><button className="navButton">LOGOUT</button> </NavLink>
-        : [<NavLink  key={1} to={routes.REGISTER} exact activeClassName='selected'><button   className="navButton">Register</button></NavLink>,
-        
-        <NavLink key={2} to={routes.LOGIN} activeClassName="selected"><button className="navButton">LOGIN</button> </NavLink>]
-    }
+          {
+            currentUser && <NavLink to={`${routes.PROFILE}/${currentUser._id}`} exact activeClassName='selected' ><button className="navButton">Profile</button></NavLink> 
+          }
+          <NavLink to={routes.USERS}  exact activeClassName='selected' ><button className="navButton">Users</button></NavLink> 
+          <NavLink to={routes.POSTS} exact activeClassName='selected' ><button className="navButton">POSTS</button></NavLink> 
+          <NavLink to={routes.EXERCISE} exact activeClassName='selected'><button className="navButton">EXERCISE</button></NavLink>  
+          <NavLink to={routes.ROOT} exact activeClassName='selected'><button className="navButton">ROOT</button></NavLink>  
+          {
+        currentUser
+          ? (<span> hello {currentUser.username} <button className="navButton" onClick={doLogout}>LOGOUT</button></span>)
+          : [<NavLink  key={1} to={routes.REGISTER} exact activeClassName='selected'><button   className="navButton">Register</button></NavLink>,
+          <NavLink key={2} to={routes.LOGIN} activeClassName="selected"><button className="navButton">LOGIN</button> </NavLink>]
+          }
     </div>
 
 export default Nav

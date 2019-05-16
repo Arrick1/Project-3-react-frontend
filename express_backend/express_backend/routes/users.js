@@ -4,8 +4,13 @@ const bcrypt = require("bcryptjs")
 
 const User = require('../models/User')
 
-
-// router.get('/login', async (req, res))
+const logUser = (req, res, next) => {
+  if(req.session.logged) {
+      next()
+  } else {
+      res.redirect("/auth/login");
+  }
+}
 
 
 // This is the Register route
@@ -38,8 +43,6 @@ router.post('/login', async (req, res)=> {
     }else {
       res.json({message})
     }
-
-  
   } catch (err) {
     res.json({err})
   }
@@ -61,15 +64,51 @@ router.get('/logout', (req, res) => {
 })
 
 
+// This is the users routes with workouts
+router.get('/profile', async (req, res) => {
+  try{
+    console.log(req.session.userId)
+    console.log('getting user')
+    const foundUser = await User.findById(req.session.userId)
+    console.log(foundUser)
+    res.json({
+      workouts: foundUser.workouts
+    })
 
+  }catch (err){
+    console.log(err)
+  }
+})
+
+// This is the show route
 router.get('/:id', async (req, res) => {
   try {
     const user = await User.findById(req.params.id)
-    res.json({user})
+    res.json({
+      user,
+      currentUser: req.session.userId,
+      logged: req.session.logged
+    })
   } catch (err) {
     res.json({err})
   }
 });
+
+// This is the Edit Route
+router.get('/:id/edit', logUser, async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id)
+    res.json({
+      user,
+      currentUser: req.session.userId,
+      logged: req.session.logged
+    })
+  } catch (err) {
+    res.json({err})
+  }
+});
+
+
 
 router.post('/',  async (req, res) => {
  try {
@@ -82,15 +121,6 @@ router.post('/',  async (req, res) => {
  }
 });
 
-// router.post('/users/:id/exercise', async (req, res) => {
-//   try {
-//     const foundUser = await User.findOne({username: req.body.username})
-    
-//   } catch (err) {
-//     res.json(err)
-    
-//   }
-// })
 
 
 router.post("/add", async(req,res)=>{
@@ -110,21 +140,26 @@ router.post("/add", async(req,res)=>{
   }
 })
 
-router.get('/profile', async (req, res) => {
-  try{
-    console.log(req.session.userId)
-    const foundUser = await User.findById(req.session.userId)
-    console.log(foundUser)
-    res.json({
-      workouts: foundUser.workouts
-    })
-
-  }catch (err){
-    console.log(err)
+router.put('/update/:id', async (req, res) => {
+  const userId = req.session.userId || req.params.id
+  try {
+    const user =  await User.findById(userId)
+    if(!req.body.password) {
+      delete req.body.password
+    } else {
+      req.body.password = user.hashPassword(req.body.password);
+      console.log(req.body.password, "<-- req.body.password after hashed");
+    } 
+    const updateUser = await User.findByIdAndUpdate(userId, req.body, {
+      new: true
+    });
+    console.log(req.body, "<-- req.body");
+    console.log(updateUser, "<-- updatedUser");
+    res.json({ updateUser });
+  } catch (err) {
+    console.log(err);
+    res.send(err);
   }
-})
-router.put('/', (req, res) => {
-  return res.json({data: 'Received a GET HTTP method users'});
 });
 
 router.delete('/', (req, res) => {
